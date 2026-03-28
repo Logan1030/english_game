@@ -80,6 +80,8 @@ String getCategoryName(String category) {
       return '食物篇';
     case 'body':
       return '身体篇';
+    case 'chinese':
+      return '语文篇';
     default:
       return category;
   }
@@ -98,6 +100,8 @@ String getCategoryEmoji(String category) {
       return '🍎';
     case 'body':
       return '💪';
+    case 'chinese':
+      return '🇨🇳';
     default:
       return '📚';
   }

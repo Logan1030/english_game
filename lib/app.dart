@@ -14,6 +14,7 @@ class AppTheme {
   static const Color animalsCategory = Color(0xFFFFE66D);
   static const Color foodsCategory = Color(0xFF95E1D3);
   static const Color bodyCategory = Color(0xFFFFB6C1); // 浅粉色
+  static const Color chineseCategory = Color(0xFFFF7043); // 橙色，语文模块
 
   static Color getCategoryColor(String category) {
     switch (category) {
@@ -27,6 +28,8 @@ class AppTheme {
         return foodsCategory;
       case 'body':
         return bodyCategory;
+      case 'chinese':
+        return chineseCategory;
       default:
         return primaryColor;
     }

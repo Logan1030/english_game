@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../app.dart';
 import '../data/words_data.dart';
+import '../data/pinyin_data.dart';
 import '../utils/storage_helper.dart';
 import 'game_screen.dart';
+import 'chinese_game_screen.dart';
 
 /// 首页 - 关卡选择
 class HomeScreen extends StatefulWidget {
@@ -35,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['colors', 'numbers', 'animals', 'foods', 'body'];
+    final categories = ['colors', 'numbers', 'animals', 'foods', 'body', 'chinese'];
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -52,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '英语小游戏',
+                        '学习小游戏',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -60,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        '一起学英语吧！',
+                        '一起学习吧！',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
@@ -139,9 +141,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategoryCard(String category) {
     final color = AppTheme.getCategoryColor(category);
-    final emoji = getCategoryEmoji(category);
-    final name = getCategoryName(category);
-    final stars = _progress[category] ?? 0;
+    final String emoji;
+    final String name;
+    final int stars;
+
+    if (category == 'chinese') {
+      emoji = getChineseModuleEmoji();
+      name = getChineseModuleName();
+      // 语文模块显示所有子模块的累计星星
+      int totalChineseStars = 0;
+      for (var subCat in getChineseSubCategories()) {
+        totalChineseStars += _progress[subCat] ?? 0;
+      }
+      stars = totalChineseStars;
+    } else {
+      emoji = getCategoryEmoji(category);
+      name = getCategoryName(category);
+      stars = _progress[category] ?? 0;
+    }
 
     return GestureDetector(
       onTap: () => _navigateToGame(category),
@@ -207,12 +224,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToGame(String category) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GameScreen(category: category),
-      ),
-    ).then((_) => _loadProgress());
+    if (category == 'chinese') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ChineseGameScreen(),
+        ),
+      ).then((_) => _loadProgress());
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GameScreen(category: category),
+        ),
+      ).then((_) => _loadProgress());
+    }
   }
 
   void _showResetDialog() {

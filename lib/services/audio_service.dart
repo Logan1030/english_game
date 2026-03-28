@@ -20,6 +20,20 @@ class AudioService {
     _isInitialized = true;
   }
 
+  /// 初始化中文TTS
+  Future<void> initChinese() async {
+    await _flutterTts.setLanguage('zh-CN');
+    await _flutterTts.setSpeechRate(0.4);
+    await _flutterTts.setPitch(1.1);
+    await _flutterTts.setVolume(1.0);
+  }
+
+  /// 播放中文发音
+  Future<void> speakChinese(String text) async {
+    await initChinese();
+    await _flutterTts.speak(text);
+  }
+
   /// 播放单词发音
   Future<void> speak(String word) async {
     await init();
