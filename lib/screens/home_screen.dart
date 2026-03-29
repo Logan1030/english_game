@@ -5,6 +5,7 @@ import '../data/pinyin_data.dart';
 import '../utils/storage_helper.dart';
 import 'game_screen.dart';
 import 'chinese_game_screen.dart';
+import 'english_numbers_game_screen.dart';
 
 /// 首页 - 关卡选择
 class HomeScreen extends StatefulWidget {
@@ -37,7 +38,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['colors', 'numbers', 'animals', 'foods', 'body', 'chinese'];
+    // 所有英文学习类别
+    final categories = [
+      'colors',
+      'numbers',
+      'animals',
+      'foods',
+      'body',
+      'clothes',
+      'vehicles',
+      'nature',
+      'family',
+      'emotions',
+      'actions',
+      'shapes',
+      'time',
+      'chinese',
+      'english_numbers',
+    ];
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -102,15 +120,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // 主题卡片网格
+            // 主题卡片网格 - 使用3列布局
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                     childAspectRatio: 0.85,
                   ),
                   itemCount: categories.length,
@@ -154,6 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
         totalChineseStars += _progress[subCat] ?? 0;
       }
       stars = totalChineseStars;
+    } else if (category == 'english_numbers') {
+      emoji = '🔤';
+      name = '英语数字';
+      stars = _progress[category] ?? 0;
     } else {
       emoji = getCategoryEmoji(category);
       name = getCategoryName(category);
@@ -169,12 +191,12 @@ class _HomeScreenState extends State<HomeScreen> {
             end: Alignment.bottomRight,
             colors: [color, color.withValues(alpha: 0.7)],
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: color.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -183,33 +205,36 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               emoji,
-              style: const TextStyle(fontSize: 60),
+              style: const TextStyle(fontSize: 40),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               name,
               style: const TextStyle(
-                fontSize: 22,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 18),
-                  const SizedBox(width: 4),
+                  const Icon(Icons.star, color: Colors.amber, size: 14),
+                  const SizedBox(width: 2),
                   Text(
                     '$stars',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -229,6 +254,13 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => const ChineseGameScreen(),
+        ),
+      ).then((_) => _loadProgress());
+    } else if (category == 'english_numbers') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const EnglishNumbersGameScreen(),
         ),
       ).then((_) => _loadProgress());
     } else {

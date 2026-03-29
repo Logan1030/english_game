@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:english_game/models/word_model.dart';
-import 'package:english_game/widgets/flashcard_widget.dart';
+import '../../lib/models/word_model.dart';
+import '../../lib/widgets/flashcard_widget.dart';
 
 void main() {
   group('FlashcardWidget', () {

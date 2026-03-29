@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:english_game/models/word_model.dart';
+import '../../lib/models/word_model.dart';
 
 void main() {
   group('WordModel', () {

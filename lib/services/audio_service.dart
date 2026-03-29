@@ -1,41 +1,56 @@
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-/// TTS 发音服务
+/// 发音服务 - 支持本地音频和TTS
 class AudioService {
   static final AudioService _instance = AudioService._internal();
   factory AudioService() => _instance;
   AudioService._internal();
 
   final FlutterTts _flutterTts = FlutterTts();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isInitialized = false;
 
   Future<void> init() async {
     if (_isInitialized) return;
 
+    // 初始化TTS
     await _flutterTts.setLanguage('en-US');
-    await _flutterTts.setSpeechRate(0.4); // 较慢的语速，适合儿童
-    await _flutterTts.setPitch(1.1); // 稍高的音调，更友好
+    await _flutterTts.setSpeechRate(0.4);
+    await _flutterTts.setPitch(1.1);
     await _flutterTts.setVolume(1.0);
 
     _isInitialized = true;
   }
 
-  /// 初始化中文TTS
-  Future<void> initChinese() async {
+  /// 播放中文发音
+  Future<void> speakChinese(String text) async {
     await _flutterTts.setLanguage('zh-CN');
     await _flutterTts.setSpeechRate(0.4);
     await _flutterTts.setPitch(1.1);
     await _flutterTts.setVolume(1.0);
-  }
-
-  /// 播放中文发音
-  Future<void> speakChinese(String text) async {
-    await initChinese();
     await _flutterTts.speak(text);
   }
 
-  /// 播放单词发音
-  Future<void> speak(String word) async {
+  /// 播放单词发音 - 优先本地音频，TTS fallback
+  Future<void> speak(String word, {String? category}) async {
+    if (category != null) {
+      // 尝试播放本地音频
+      try {
+        final String audioPath = 'sounds/english/$category/$word.mp3';
+        await _audioPlayer.play(AssetSource(audioPath));
+        return;
+      } catch (e) {
+        // 文件不存在，使用TTS
+      }
+    }
+    // TTS fallback
+    await init();
+    await _flutterTts.speak(word);
+  }
+
+  /// 播放单词发音（仅TTS，不尝试本地文件）
+  Future<void> speakTts(String word) async {
     await init();
     await _flutterTts.speak(word);
   }
@@ -76,7 +91,14 @@ class AudioService {
     await _flutterTts.speak(text);
   }
 
+  /// 停止播放
+  Future<void> stop() async {
+    await _audioPlayer.stop();
+    await _flutterTts.stop();
+  }
+
   void dispose() {
+    _audioPlayer.dispose();
     _flutterTts.stop();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:english_game/utils/storage_helper.dart';
+import '../../lib/utils/storage_helper.dart';
 
 void main() {
   setUp(() {

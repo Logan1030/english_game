@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:english_game/widgets/matching_card.dart';
+import '../../lib/widgets/matching_card.dart';
 
 void main() {
   group('MatchingCard Widget', () {

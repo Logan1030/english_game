@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:english_game/screens/game_screen.dart';
-import 'package:english_game/data/words_data.dart';
-import 'package:english_game/utils/storage_helper.dart';
-import 'package:english_game/widgets/flashcard_widget.dart';
-import 'package:english_game/widgets/matching_card.dart';
-import 'package:english_game/widgets/progress_bar.dart';
+import '../../lib/screens/game_screen.dart';
+import '../../lib/data/words_data.dart';
+import '../../lib/utils/storage_helper.dart';
+import '../../lib/widgets/flashcard_widget.dart';
+import '../../lib/widgets/matching_card.dart';
+import '../../lib/widgets/progress_bar.dart';
 
 void main() {
   setUp(() {

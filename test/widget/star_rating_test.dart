@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:english_game/widgets/star_rating.dart';
+import '../../lib/widgets/star_rating.dart';
 
 void main() {
   group('StarRating Widget', () {

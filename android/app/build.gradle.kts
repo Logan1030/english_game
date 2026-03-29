@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kidsenglish.english_game"
+    namespace = "com.kidsenglish.english_game_v3_0329"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.kidsenglish.english_game"
+        applicationId = "com.kidsenglish.english_game_v3_0329"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

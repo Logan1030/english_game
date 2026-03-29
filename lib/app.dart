@@ -14,7 +14,16 @@ class AppTheme {
   static const Color animalsCategory = Color(0xFFFFE66D);
   static const Color foodsCategory = Color(0xFF95E1D3);
   static const Color bodyCategory = Color(0xFFFFB6C1); // 浅粉色
+  static const Color clothesCategory = Color(0xFF9B59B6); // 紫色
+  static const Color vehiclesCategory = Color(0xFF3498DB); // 蓝色
+  static const Color natureCategory = Color(0xFF2ECC71); // 绿色
+  static const Color familyCategory = Color(0xFFE91E63); // 粉红色
+  static const Color emotionsCategory = Color(0xFFFF9800); // 橙色
+  static const Color actionsCategory = Color(0xFF00BCD4); // 青色
+  static const Color shapesCategory = Color(0xFF673AB7); // 深紫色
+  static const Color timeCategory = Color(0xFF795548); // 棕色
   static const Color chineseCategory = Color(0xFFFF7043); // 橙色，语文模块
+  static const Color englishNumbersCategory = Color(0xFF00BCD4); // 青色，英语数字
 
   static Color getCategoryColor(String category) {
     switch (category) {
@@ -28,8 +37,26 @@ class AppTheme {
         return foodsCategory;
       case 'body':
         return bodyCategory;
+      case 'clothes':
+        return clothesCategory;
+      case 'vehicles':
+        return vehiclesCategory;
+      case 'nature':
+        return natureCategory;
+      case 'family':
+        return familyCategory;
+      case 'emotions':
+        return emotionsCategory;
+      case 'actions':
+        return actionsCategory;
+      case 'shapes':
+        return shapesCategory;
+      case 'time':
+        return timeCategory;
       case 'chinese':
         return chineseCategory;
+      case 'english_numbers':
+        return englishNumbersCategory;
       default:
         return primaryColor;
     }

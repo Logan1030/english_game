@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:english_game/screens/game_screen.dart';
-import 'package:english_game/utils/storage_helper.dart';
-import 'package:english_game/widgets/matching_card.dart';
+import '../../lib/screens/game_screen.dart';
+import '../../lib/utils/storage_helper.dart';
+import '../../lib/widgets/matching_card.dart';
 
 void main() {
   setUp(() {

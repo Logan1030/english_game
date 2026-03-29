@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="english_game"
+        android:label="趣玩乐"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

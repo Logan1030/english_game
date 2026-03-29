@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:english_game/data/words_data.dart';
+import '../../lib/data/words_data.dart';
 
 void main() {
   group('words_data', () {
