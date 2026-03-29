@@ -40,18 +40,21 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
   // 拼写模式状态
   int _spellIndex = 0;
   List<String> _availableLetters = [];
-  List<String> _selectedLetters = [];
+  List<int> _selectedIndices = [];
   int _spellStars = 0;
+  int _spellAttempts = 0;
+  List<EnglishWordModel> _wrongWords = [];
 
   // 极速闯关模式状态
   int _rapidIndex = 0;
   int _rapidCorrect = 0;
   int _rapidTimeLeft = 5;
   bool _rapidAnswered = false;
-  List<String> _rapidSelected = [];
+  List<int> _rapidSelectedIndices = [];
   List<int> _rapidTimes = [];
   Timer? _rapidTimer;
   List<EnglishWordModel> _rapidQuestions = [];
+  List<String> _rapidAvailableLetters = [];
 
   @override
   void initState() {
@@ -472,12 +475,15 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
   void _initSpellGame() {
     _spellIndex = 0;
     _spellStars = 0;
+    _spellAttempts = 0;
+    _wrongWords = [];
     _setupSpellLetters();
   }
 
   void _setupSpellLetters() {
     final current = englishWordsData[_spellIndex];
-    _selectedLetters = [];
+    _selectedIndices = [];
+    _spellAttempts = 0;
 
     _availableLetters = List.from(current.letters);
     final distractorLetters = ['x', 'z', 'q', 'y', 'k', 'j', 'v', 'w'];
@@ -542,8 +548,8 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(targetLength, (index) {
-              final hasLetter = index < _selectedLetters.length;
-              final letter = hasLetter ? _selectedLetters[index] : '';
+              final hasLetter = index < _selectedIndices.length;
+              final letter = hasLetter ? _availableLetters[_selectedIndices[index]] : '';
               final isCorrect = hasLetter &&
                   letter.toLowerCase() == current.letters[index].toLowerCase();
 
@@ -598,15 +604,16 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
             runSpacing: 8,
             alignment: WrapAlignment.center,
             children: _availableLetters.asMap().entries.map((entry) {
+              final index = entry.key;
               final letter = entry.value;
-              final isUsed = _selectedLetters.contains(letter);
+              final isUsed = _selectedIndices.contains(index);
 
               return LetterTileWidget(
                 letter: letter,
                 isSelected: isUsed,
                 isInTarget: false,
                 isCorrectPosition: false,
-                onTap: () => _onLetterTap(letter),
+                onTap: () => _onLetterTap(index, letter),
               );
             }).toList(),
           ),
@@ -619,13 +626,13 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              if (_selectedLetters.isNotEmpty)
+              if (_selectedIndices.isNotEmpty)
                 _buildNavButton(
                   icon: Icons.undo,
                   label: '撤销',
                   onTap: () {
                     setState(() {
-                      _selectedLetters.removeLast();
+                      _selectedIndices.removeLast();
                     });
                   },
                   color: Colors.grey,
@@ -636,13 +643,13 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
                 onTap: () => _audioService.speak(current.word),
                 color: AppTheme.secondaryColor,
               ),
-              if (_selectedLetters.isNotEmpty)
+              if (_selectedIndices.isNotEmpty)
                 _buildNavButton(
                   icon: Icons.refresh,
                   label: '清除',
                   onTap: () {
                     setState(() {
-                      _selectedLetters.clear();
+                      _selectedIndices.clear();
                     });
                   },
                   color: const Color(0xFFFF6B6B),
@@ -657,26 +664,27 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
   }
 
   bool hasAllCorrect() {
-    if (_selectedLetters.length != englishWordsData[_spellIndex].letters.length) {
+    if (_selectedIndices.length != englishWordsData[_spellIndex].letters.length) {
       return false;
     }
-    for (int i = 0; i < _selectedLetters.length; i++) {
-      if (_selectedLetters[i].toLowerCase() !=
-          englishWordsData[_spellIndex].letters[i].toLowerCase()) {
+    for (int i = 0; i < _selectedIndices.length; i++) {
+      final selectedLetter = _availableLetters[_selectedIndices[i]].toLowerCase();
+      final targetLetter = englishWordsData[_spellIndex].letters[i].toLowerCase();
+      if (selectedLetter != targetLetter) {
         return false;
       }
     }
     return true;
   }
 
-  void _onLetterTap(String letter) {
-    if (_selectedLetters.contains(letter)) return;
+  void _onLetterTap(int index, String letter) {
+    if (_selectedIndices.contains(index)) return;
 
     setState(() {
-      _selectedLetters.add(letter);
+      _selectedIndices.add(index);
     });
 
-    if (_selectedLetters.length == englishWordsData[_spellIndex].letters.length) {
+    if (_selectedIndices.length == englishWordsData[_spellIndex].letters.length) {
       if (hasAllCorrect()) {
         _spellStars++;
         _audioService.playCheerSound();
@@ -687,10 +695,22 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
           }
         });
       } else {
-        _audioService.speak('try again');
-        setState(() {
-          _selectedLetters.clear();
-        });
+        _spellAttempts++;
+        if (_spellAttempts >= 3) {
+          // 错题加入错题本
+          _wrongWords.add(englishWordsData[_spellIndex]);
+          _audioService.speak('skip');
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              _nextSpellWord();
+            }
+          });
+        } else {
+          _audioService.speak('try again');
+          setState(() {
+            _selectedIndices.clear();
+          });
+        }
       }
     }
   }
@@ -769,9 +789,10 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
   }
 
   void _setupRapidQuestion() {
-    _rapidSelected = [];
+    _rapidSelectedIndices = [];
     _rapidAnswered = false;
     _rapidTimeLeft = 5;
+    _rapidAvailableLetters = _buildRapidLetterPool(_rapidQuestions[_rapidIndex]);
     _startRapidTimer();
   }
 
@@ -882,8 +903,8 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(targetLength, (index) {
-              final hasLetter = index < _rapidSelected.length;
-              final letter = hasLetter ? _rapidSelected[index] : '';
+              final hasLetter = index < _rapidSelectedIndices.length;
+              final letter = hasLetter ? _rapidAvailableLetters[_rapidSelectedIndices[index]] : '';
               final isCorrect = hasLetter &&
                   letter.toLowerCase() == current.letters[index].toLowerCase();
 
@@ -925,16 +946,17 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.center,
-            children: _buildRapidLetterPool(current).asMap().entries.map((entry) {
+            children: _rapidAvailableLetters.asMap().entries.map((entry) {
+              final index = entry.key;
               final letter = entry.value;
-              final isUsed = _rapidSelected.contains(letter);
+              final isUsed = _rapidSelectedIndices.contains(index);
 
               return LetterTileWidget(
                 letter: letter,
                 isSelected: isUsed,
                 isInTarget: false,
                 isCorrectPosition: false,
-                onTap: () => _onRapidLetterTap(letter),
+                onTap: () => _onRapidLetterTap(index, letter),
               );
             }).toList(),
           ),
@@ -971,15 +993,15 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
     return pool;
   }
 
-  void _onRapidLetterTap(String letter) {
+  void _onRapidLetterTap(int index, String letter) {
     if (_rapidAnswered) return;
-    if (_rapidSelected.contains(letter)) return;
+    if (_rapidSelectedIndices.contains(index)) return;
 
     final current = _rapidQuestions[_rapidIndex];
 
-    setState(() => _rapidSelected.add(letter));
+    setState(() => _rapidSelectedIndices.add(index));
 
-    if (_rapidSelected.length == current.letters.length) {
+    if (_rapidSelectedIndices.length == current.letters.length) {
       if (_checkRapidCorrect()) {
         _rapidTimer?.cancel();
         _rapidCorrect++;
@@ -993,18 +1015,19 @@ class _EnglishWordsGameScreenState extends State<EnglishWordsGameScreen> {
         });
       } else {
         _audioService.speak('try again');
-        setState(() => _rapidSelected.clear());
+        setState(() => _rapidSelectedIndices.clear());
       }
     }
   }
 
   bool _checkRapidCorrect() {
-    if (_rapidSelected.length != _rapidQuestions[_rapidIndex].letters.length) {
+    if (_rapidSelectedIndices.length != _rapidQuestions[_rapidIndex].letters.length) {
       return false;
     }
-    for (int i = 0; i < _rapidSelected.length; i++) {
-      if (_rapidSelected[i].toLowerCase() !=
-          _rapidQuestions[_rapidIndex].letters[i].toLowerCase()) {
+    for (int i = 0; i < _rapidSelectedIndices.length; i++) {
+      final selectedLetter = _rapidAvailableLetters[_rapidSelectedIndices[i]].toLowerCase();
+      final targetLetter = _rapidQuestions[_rapidIndex].letters[i].toLowerCase();
+      if (selectedLetter != targetLetter) {
         return false;
       }
     }
