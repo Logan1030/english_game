@@ -6,6 +6,7 @@ import '../utils/storage_helper.dart';
 import 'game_screen.dart';
 import 'chinese_game_screen.dart';
 import 'english_numbers_game_screen.dart';
+import 'english_words_game_screen.dart';
 
 /// 首页 - 关卡选择
 class HomeScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'time',
       'chinese',
       'english_numbers',
+      'english_words',
     ];
 
     return Scaffold(
@@ -176,6 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
       emoji = '🔤';
       name = '英语数字';
       stars = _progress[category] ?? 0;
+    } else if (category == 'english_words') {
+      emoji = '💪';
+      name = '英语词汇';
+      stars = _progress[category] ?? 0;
     } else {
       emoji = getCategoryEmoji(category);
       name = getCategoryName(category);
@@ -261,6 +267,13 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => const EnglishNumbersGameScreen(),
+        ),
+      ).then((_) => _loadProgress());
+    } else if (category == 'english_words') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const EnglishWordsGameScreen(),
         ),
       ).then((_) => _loadProgress());
     } else {

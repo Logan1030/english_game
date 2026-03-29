@@ -24,6 +24,7 @@ class AppTheme {
   static const Color timeCategory = Color(0xFF795548); // 棕色
   static const Color chineseCategory = Color(0xFFFF7043); // 橙色，语文模块
   static const Color englishNumbersCategory = Color(0xFF00BCD4); // 青色，英语数字
+  static const Color englishWordsCategory = Color(0xFF9B59B6); // 紫色，英语词汇
 
   static Color getCategoryColor(String category) {
     switch (category) {
@@ -57,6 +58,8 @@ class AppTheme {
         return chineseCategory;
       case 'english_numbers':
         return englishNumbersCategory;
+      case 'english_words':
+        return englishWordsCategory;
       default:
         return primaryColor;
     }
